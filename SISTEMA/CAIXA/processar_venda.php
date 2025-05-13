@@ -2,7 +2,14 @@
 session_start();
 include 'config.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['finalizar_venda'])) {
+$erro = "";
+
+if (stripos($_POST['quantidade'], 'e') !== false) {
+    $erro = "Digite apenas números no campo 'Quantidade'";
+    header("Location: caixa.php?erro=$erro");
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['finalizar_venda']) && empty($erro)) {
     $produto_id = $_POST['produto_id'];
     $quantidade = $_POST['quantidade'];
 
@@ -11,12 +18,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['finalizar_venda'])) {
     $produto = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($produto) {
-         if ($produto['estoque'] >= $quantidade) {
+        if ($produto['estoque'] >= $quantidade) {
 
             if (!isset($_SESSION['itens'])) {
                 $_SESSION['itens'] = [];
             }
-
 
             $produto_existente = false;
             foreach ($_SESSION['itens'] as $key => $item) {
@@ -36,11 +42,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['finalizar_venda'])) {
                 ];
             }
         } else {
-            echo "<script>alert('Estoque insuficiente para este produto.'); window.location.href='caixa.php';</script>";
+            $erro = 'Estoque insuficiente para este produto.';
+            echo "<script>alert($erro); window.location.href='caixa.php?erro=$erro';</script>";
             exit;
         }
     }
+} elseif (!empty($erro)) {
+    header("Location: caixa.php?erro=$erro");
+    echo "<script>alert('$erro'); window.location.href='caixa.php?erro=$erro';</script>";
+    exit;
 }
+
+
+
 
 if (isset($_POST['finalizar_venda'])) {
     if (isset($_SESSION['itens']) && !empty($_SESSION['itens'])) {
@@ -59,21 +73,20 @@ if (isset($_POST['finalizar_venda'])) {
             }
 
             $pdo->commit();
-            unset($_SESSION['itens']); // Limpar o carrinho
-            echo "<script>alert('Venda finalizada com sucesso!'); window.location.href='caixa.php';</script>";
+            unset($_SESSION['itens']);
+            echo "<script>alert('Venda finalizada com sucesso!'); window.location.href='caixa.php?erro=$erro';</script>";
         } catch (Exception $e) {
             $pdo->rollBack();
-            echo "<script>alert('Erro ao finalizar a venda: " . $e->getMessage() . "'); window.location.href='caixa.php';</script>";
+            echo "<script>alert('Erro ao finalizar a venda: " . $e->getMessage() . "'); window.location.href='caixa.php?erro=$erro';</script>";
         }
     }
 }
 
 if (isset($_GET['cancelar_venda'])) {
-    unset($_SESSION['itens']); // Limpar o carrinho
-    header("Location: caixa.php");
+    unset($_SESSION['itens']);
+    header("Location: caixa.php?erro=$erro");
     exit;
 }
 
-header("Location: caixa.php");
+header("Location: caixa.php?erro=$erro");
 exit;
-?>
