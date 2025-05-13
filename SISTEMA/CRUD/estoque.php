@@ -86,12 +86,12 @@ if (isset($_GET['edit'])) {
 
                 <div class="form-group">
                     <label for="quantidade">Quantidade:</label>
-                    <input type="number" id="quantidade" name="quantidade" value="<?= htmlspecialchars($quantidade) ?>" required>
+                    <input type="number" id="quantidade" name="quantidade" min=1 value="<?= htmlspecialchars($quantidade) ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="preco">Preço:</label>
-                    <input type="number" step="0.01" id="preco" name="preco" value="<?= htmlspecialchars($preco) ?>" required>
+                    <input type="number" step="0.01" id="preco" name="preco" min=0.1 value="<?= htmlspecialchars($preco) ?>" required>
                 </div>
 
                 <?php
