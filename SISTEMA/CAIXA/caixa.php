@@ -1,26 +1,31 @@
+<?php
+$erro = $_GET['erro'];
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caixa Simples</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container">
         <h1>Caixa do Mercado</h1>
-
-        <div class="form-buttons">           
-                <a href="../Index.html" class="btn btn-primary">Sair do caixa</a>
+        <div class="form-buttons">
+            <a href="../Index.html" class="btn btn-primary">Sair do caixa</a>
         </div>
-        
+
         <form action="processar_venda.php" method="post" class="caixa-form">
             <div class="form-group">
                 <label for="produto">Produto:</label>
                 <select name="produto_id" id="produto" required>
                     <option value="">Selecione um produto</option>
                     <?php
-                    include 'config.php';                                                                               
+                    include 'config.php';
                     $stmt = $pdo->query('SELECT id, nome, preco FROM produtos_tbl');
                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
                         <option value="<?= htmlspecialchars($row['id']) ?>" data-preco="<?= htmlspecialchars($row['preco']) ?>">
@@ -35,9 +40,13 @@
                 <input type="number" name="quantidade" id="quantidade" value="1" min="1" required>
             </div>
 
+
             <button type="submit" class="btn btn-success">Adicionar ao Caixa</button>
 
         </form>
+         <?php if (!empty($erro)): ?>
+                    <span><?php echo $erro; ?></span>
+                <?php endif; ?>
 
         <h2>Caixa Atual</h2>
         <table class="caixa-table">
@@ -57,7 +66,7 @@
                     foreach ($_SESSION['itens'] as $item):
                         $subtotal = $item['preco'] * $item['quantidade'];
                         $total += $subtotal;
-                        ?>
+                ?>
                         <tr>
                             <td><?= htmlspecialchars($item['nome']) ?></td>
                             <td><?= htmlspecialchars($item['quantidade']) ?></td>
@@ -84,8 +93,9 @@
             <button type="submit" class="btn btn-success" <?= ($total > 0) ? '' : 'disabled' ?>>Finalizar Venda</button>
             <a href="processar_venda.php?cancelar_venda=true" class="btn btn-danger" <?= ($total > 0) ? '' : 'disabled' ?>>Cancelar Venda</a>
         </form>
-        
+
     </div>
-   
+
 </body>
+
 </html>
