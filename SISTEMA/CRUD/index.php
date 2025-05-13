@@ -85,12 +85,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group">
                     <label>Quantidade:</label>
-                    <input type="text" name="quantidade" value="<?php echo htmlspecialchars($quantidade); ?>" required><br>
+                    <input type="number" name="quantidade" min=1 value="<?php echo htmlspecialchars($quantidade); ?>" required><br>
                 </div>
 
                 <div class="form-group">
                     <label>Preço:</label>
-                    <input type="text" name="preco" value="<?php echo htmlspecialchars($preco); ?>" required><br>
+                    <input type="number" name="preco" min=0.1 value="<?php echo htmlspecialchars($preco); ?>" required><br>
                 </div>
 
                 <?php
