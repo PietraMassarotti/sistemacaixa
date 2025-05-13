@@ -1,7 +1,7 @@
 <?php
 require("../CAIXA/config.php");
 
-$erro="";
+$erro = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['action']) && $_POST['action'] == 'delete') {
@@ -13,21 +13,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<div class='alert alert-success'>Produto excluído com sucesso!</div>";
     } else {
 
-        $nome = $_POST['nome'];
-        $quantidade = $_POST['quantidade'];
-        $preco = $_POST['preco'];
+        $nome = trim($_POST['nome']);
+        $quantidade = trim($_POST['quantidade']);
+        $preco = trim($_POST['preco']);
 
-
-        if (!preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $nome)) {
-            $erro = "Não use caracteres especiais!";
+        if (empty($nome) || empty($quantidade) || empty($preco)) {
+            $erro = "Por favor preencha todos os campos!";
         } else {
-            if (stripos($quantidade, 'e') == true || stripos($preco, 'e') == true) {
-                $erro = "Digite apenas números no campo 'Quantidade' e 'Preço'";
+            if (!preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $nome)) {
+                $erro = "Não use caracteres especiais no campo 'Nome'!";
             } else {
-                $sql = "INSERT INTO produtos_tbl (nome, quantidade, preco) VALUES (:nome, :quantidade, :preco)";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute(['nome' => $nome, 'quantidade' => $quantidade, 'preco' => $preco]);
-                echo "<div class='alert alert-success'>Produto criado com sucesso!</div>";
+                if (stripos($quantidade, 'e') == true || stripos($preco, 'e') == true) {
+                    $erro = "Digite apenas números no campo 'Quantidade' e 'Preço'!";
+                } else {
+                    $sql = "INSERT INTO produtos_tbl (nome, quantidade, preco) VALUES (:nome, :quantidade, :preco)";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute(['nome' => $nome, 'quantidade' => $quantidade, 'preco' => $preco]);
+                    echo "<div class='alert alert-success'>Produto criado com sucesso!</div>";
+                }
             }
         }
     }
