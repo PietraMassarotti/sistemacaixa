@@ -26,32 +26,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST["id"], $_POST["nome"], $_POST["quantidade"], $_POST["preco"])) {
-        $id = $_POST["id"];
-        $nome = $_POST["nome"];
-        $quantidade = $_POST["quantidade"];
-        $preco = $_POST["preco"];
+        $id = trim($_POST["id"]);
+        $nome = trim($_POST["nome"]);
+        $quantidade = trim($_POST["quantidade"]);
+        $preco = trim($_POST["preco"]);
 
-        if (!preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $nome)) {
-            $erro = "Não use caracteres especiais!";
-        } else {
-            if (stripos($quantidade, 'e') == true || stripos($preco, 'e') == true) {
-                $erro = "Digite apenas números no campo 'Quantidade' e 'Preço'";
+        if (empty($nome) || empty($quantidade) || empty($preco)) {
+            $erro = "Por favor preencha todos os campos!";
+        }else{
+            if (!preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $nome)) {
+                $erro = "Não use caracteres especiais no campo 'Nome'!";
             } else {
-                $preco = str_replace(',', '.', $preco);
-
-
-                $stmt = $pdo->prepare("UPDATE produtos_tbl SET nome = :nome, quantidade = :quantidade, preco = :preco WHERE id = :id");
-                $stmt->execute([
-                    'id' => $id,
-                    'nome' => $nome,
-                    'quantidade' => $quantidade,
-                    'preco' => $preco
-                ]);
-
-                header("Location: estoque.php");
-                exit;
+                if (stripos($quantidade, 'e') == true || stripos($preco, 'e') == true) {
+                    $erro = "Digite apenas números no campo 'Quantidade' e 'Preço'!";
+                } else {
+                    $preco = str_replace(',', '.', $preco);
+    
+    
+                    $stmt = $pdo->prepare("UPDATE produtos_tbl SET nome = :nome, quantidade = :quantidade, preco = :preco WHERE id = :id");
+                    $stmt->execute([
+                        'id' => $id,
+                        'nome' => $nome,
+                        'quantidade' => $quantidade,
+                        'preco' => $preco
+                    ]);
+    
+                    header("Location: estoque.php");
+                    exit;
+                }
             }
         }
+        
     } else {
         echo "Dados incompletos.";
     }
