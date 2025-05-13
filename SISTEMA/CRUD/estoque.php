@@ -16,25 +16,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $nome = trim($_POST['nome']);
         $quantidade = trim($_POST['quantidade']);
         $preco = trim($_POST['preco']);
+        $preco = str_replace(',', '.', $preco);
 
         if (empty($nome) || empty($quantidade) || empty($preco)) {
             $erro = "Por favor preencha todos os campos!";
         } else {
-            if (!preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $nome)) {
-                $erro = "Não use caracteres especiais no campo 'Nome'!";
+            if (!preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $nome) || !preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $quantidade) || !preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ.,]*$/", $preco)) {
+                $erro = "Não use caracteres especiais!";
             } else {
                 if (stripos($quantidade, 'e') == true || stripos($preco, 'e') == true) {
                     $erro = "Digite apenas números no campo 'Quantidade' e 'Preço'!";
                 } else {
-                    $sql = "INSERT INTO produtos_tbl (nome, quantidade, preco) VALUES (:nome, :quantidade, :preco)";
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute(['nome' => $nome, 'quantidade' => $quantidade, 'preco' => $preco]);
-                    echo "<div class='alert alert-success'>Produto criado com sucesso!</div>";
+                    if (!preg_match("/^\d+(.\d{1,2})?$/", $preco)) {
+                        $erro = "Digite apenas duas casas decimais após a virgula no campo 'Preço'!";
+                    } else {
+
+                        $sql = "INSERT INTO produtos_tbl (nome, quantidade, preco) VALUES (:nome, :quantidade, :preco)";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute(['nome' => $nome, 'quantidade' => $quantidade, 'preco' => $preco]);
+                        echo "<div class='alert alert-success'>Produto criado com sucesso!</div>";
+                    }
                 }
             }
         }
     }
 }
+
 
 $nome = "";
 $quantidade = "";
@@ -76,7 +83,7 @@ if (isset($_GET['edit'])) {
                 <a href="../Index.html" class="btn btn-secondary">Sair do estoque</a>
             </div>
             <h2><?= ($id_update) ? 'Editar Produto' : 'Adicionar Produto' ?></h2>
-            <form method="post" class="product-form" onsubmit="return validarFormulario()">
+            <form method="post" class="product-form">
                 <input type="hidden" name="id" value="<?= htmlspecialchars($id_update) ?>">
 
                 <div class="form-group">
@@ -91,7 +98,7 @@ if (isset($_GET['edit'])) {
 
                 <div class="form-group">
                     <label for="preco">Preço:</label>
-                    <input type="number" step="0.01" id="preco" name="preco" min=0.1 value="<?= htmlspecialchars($preco) ?>" required>
+                    <input type="text" step="0.01" id="preco" name="preco" min=0.1 value="<?= htmlspecialchars($preco) ?>" required>
                 </div>
 
                 <?php
