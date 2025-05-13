@@ -21,14 +21,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (empty($nome) || empty($quantidade) || empty($preco)) {
             $erro = "Por favor preencha todos os campos!";
         } else {
-            if (!preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $nome) || !preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $quantidade) || !preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ.,]*$/", $preco)) {
+            if (!preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $nome) || !preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $quantidade)) {
                 $erro = "Não use caracteres especiais!";
             } else {
                 if (stripos($quantidade, 'e') == true || stripos($preco, 'e') == true) {
                     $erro = "Digite apenas números no campo 'Quantidade' e 'Preço'!";
                 } else {
                     if (!preg_match("/^\d+(.\d{1,2})?$/", $preco)) {
-                        $erro = "Digite apenas duas casas decimais após a virgula no campo 'Preço'!";
+                        $erro = "Digite apenas números com duas casas decimais após a virgula no campo 'Preço'!";
                     } else {
 
                         $sql = "INSERT INTO produtos_tbl (nome, quantidade, preco) VALUES (:nome, :quantidade, :preco)";
