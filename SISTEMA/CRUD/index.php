@@ -1,7 +1,7 @@
 <?php
 require("../CAIXA/config.php");
 
-$erro="";
+$erro = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (!isset($_GET["id"])) {
@@ -30,33 +30,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nome = trim($_POST["nome"]);
         $quantidade = trim($_POST["quantidade"]);
         $preco = trim($_POST["preco"]);
+        $preco = str_replace(',', '.', $preco);
 
         if (empty($nome) || empty($quantidade) || empty($preco)) {
             $erro = "Por favor preencha todos os campos!";
-        }else{
-            if (!preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $nome)) {
-                $erro = "Não use caracteres especiais no campo 'Nome'!";
+        } else {
+            if (!preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $nome) || !preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ ]*$/", $quantidade) || !preg_match("/^[a-zA-Z0-9 àáâãèéêìíîòóôõùúûçÀÁÂÃÈÉÊÌÍÎÒÓÔÕÙÚÛÇ.,]*$/", $preco)) {
+                $erro = "Não use caracteres especiais!";
             } else {
                 if (stripos($quantidade, 'e') == true || stripos($preco, 'e') == true) {
                     $erro = "Digite apenas números no campo 'Quantidade' e 'Preço'!";
                 } else {
-                    $preco = str_replace(',', '.', $preco);
-    
-    
-                    $stmt = $pdo->prepare("UPDATE produtos_tbl SET nome = :nome, quantidade = :quantidade, preco = :preco WHERE id = :id");
-                    $stmt->execute([
-                        'id' => $id,
-                        'nome' => $nome,
-                        'quantidade' => $quantidade,
-                        'preco' => $preco
-                    ]);
-    
-                    header("Location: estoque.php");
-                    exit;
+                    if (!preg_match("/^\d+(.\d{1,2})?$/", $preco)) {
+                        $erro = "Digite apenas duas casas decimais após a virgula no campo 'Preço'!";
+                    } else {
+
+
+
+                        $stmt = $pdo->prepare("UPDATE produtos_tbl SET nome = :nome, quantidade = :quantidade, preco = :preco WHERE id = :id");
+                        $stmt->execute([
+                            'id' => $id,
+                            'nome' => $nome,
+                            'quantidade' => $quantidade,
+                            'preco' => $preco
+                        ]);
+
+                        header("Location: estoque.php");
+                        exit;
+                    }
                 }
             }
         }
-        
     } else {
         echo "Dados incompletos.";
     }
@@ -90,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group">
                     <label>Preço:</label>
-                    <input type="number" name="preco" min=0.1 value="<?php echo htmlspecialchars($preco); ?>" required><br>
+                    <input type="text" name="preco" min=0.9 value="<?php echo htmlspecialchars($preco); ?>" required><br>
                 </div>
 
                 <?php
